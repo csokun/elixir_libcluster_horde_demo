@@ -1,21 +1,30 @@
-# MixApp1
+# Elixir Distributed & Fault Tolerance Demo
 
-**TODO: Add description**
+Pre-requisites:
+- Erlang & Elixir installed
+- Clone the project and you ready to go
 
-## Installation
+Demo
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `mix_app1` to your list of dependencies in `mix.exs`:
+- Start multiple nodes using `iex --sname <NAME> -S mix` e.g `iex --sname node1 -S mix`
+- Start greeting process from any node
 
 ```elixir
-def deps do
-  [
-    {:mix_app1, "~> 0.1.0"}
-  ]
-end
+# from node1
+Horde.DynamicSupervisor.start_link(MixApp1.DistributedSupervisor, {MixApp1.Greeting, "agent1"})
+
+# from node2
+MixApp1.Greeting.say("agent1", "hello")
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/mix_app1>.
+## Fault Tolerance
+
+Node1 goes down:
+- Kill node1 `CTRL+C`
+- From node2 re-run `MixApp1.Greeting.say("agent1", "hello")`
+
+Node1 backup & Node2 go down:
+- Start node1 `iex --sname node1 -S mix`
+- Kill node2 `CTRL+C`
+- From node1 run `MixApp1.Greeting.say("agent1", "hello")`
 

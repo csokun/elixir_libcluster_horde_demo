@@ -1,8 +1,6 @@
 defmodule MixApp1.Greeting do
   use GenServer, restart: :transient
 
-  require Logger
-
   def start_link(name) do
     case GenServer.start_link(__MODULE__, name, name: via_tuple(name)) do
       {:ok, pid} ->
