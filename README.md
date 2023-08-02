@@ -10,8 +10,8 @@ Demo
 - Start greeting process from any node
 
 ```elixir
-# from node1
-Horde.DynamicSupervisor.start_link(MixApp1.DistributedSupervisor, {MixApp1.Greeting, "agent1"})
+# from node1 start a child process
+Horde.DynamicSupervisor.start_child(MixApp1.DistributedSupervisor, {MixApp1.Greeting, "agent1"})
 
 # from node2
 MixApp1.Greeting.say("agent1", "hello")
