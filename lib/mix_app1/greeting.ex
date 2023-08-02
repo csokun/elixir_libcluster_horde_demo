@@ -16,7 +16,13 @@ defmodule MixApp1.Greeting do
   end
 
   def init(name) do
+    Process.flag(:trap_exit, true)
     {:ok, name}
+  end
+
+  def terminate(reason, _state) do
+    IO.puts("terminated with reason: #{inspect(reason)}")
+    :stop
   end
 
   def handle_call({:say, word}, _from, state) do
