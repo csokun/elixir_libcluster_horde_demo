@@ -11,22 +11,43 @@ defmodule MixApp1.Greeting do
     end
   end
 
+  def start(name) do
+    Horde.DynamicSupervisor.start_child(MixApp1.DistributedSupervisor, {__MODULE__, name})
+  end
+
   def say(name, word) do
     GenServer.call(via_tuple(name), {:say, word})
   end
 
   def init(name) do
     Process.flag(:trap_exit, true)
-    {:ok, name}
+    {:ok, %{name: name, served: 0}, {:continue, :load_state}}
   end
 
-  def terminate(reason, _state) do
+  def handle_continue(:load_state, state) do
+    IO.puts("#{inspect(state)}")
+    # retrieve state from Horde Registry
+    case Horde.Registry.meta(MixApp1.DistributedRegistry, state.name) do
+      {:ok, meta} ->
+        IO.puts("state found #{inspect(meta)}")
+        {:noreply, Map.merge(state, meta)}
+
+      :error ->
+        IO.puts("state not found")
+        {:noreply, state}
+    end
+  end
+
+  def terminate(reason, %{name: name} = state) do
     IO.puts("terminated with reason: #{inspect(reason)}")
-    :stop
+    # Use Horde Registry meta, which is kept synchronized across a cluster using a CRDT
+    Horde.Registry.put_meta(MixApp1.DistributedRegistry, name, state)
+    {:noreply, state}
   end
 
-  def handle_call({:say, word}, _from, state) do
-    {:reply, "Say, #{word} from #{state}", state}
+  def handle_call({:say, word}, _from, %{name: name, served: served} = state) do
+    state = %{state | served: served + 1}
+    {:reply, "Say, #{word} from #{name} [served: #{state.served}]", state}
   end
 
   defp via_tuple(name) do
