@@ -28,3 +28,11 @@ Node1 backup & Node2 go down:
 - Kill node2 `CTRL+C`
 - From node1 run `MixApp1.Greeting.say("agent1", "hello")`
 
+
+## Handoff
+
+delta_crdt_options: [sync_interval: 30]
+
+## References
+
+- https://www.mechanical-orchard.com/post/creating-process-continuity-in-distributed-elixir
