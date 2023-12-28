@@ -13,6 +13,9 @@ Demo
 # from node1 start a child process
 Horde.DynamicSupervisor.start_child(MixApp1.DistributedSupervisor, {MixApp1.Greeting, "agent1"})
 
+# or
+MixApp1.Greeting.start("agent1")
+
 # from node2
 MixApp1.Greeting.say("agent1", "hello")
 ```
