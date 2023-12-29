@@ -42,7 +42,8 @@ defmodule MixApp1.Greeting do
     IO.puts("terminated with reason: #{inspect(reason)}")
     # Use Horde Registry meta, which is kept synchronized across a cluster using a CRDT
     Horde.Registry.put_meta(MixApp1.DistributedRegistry, name, state)
-    {:noreply, state}
+    # Give process a couple ms to sync up
+    Process.sleep(500)
   end
 
   def handle_call({:say, word}, _from, %{name: name, served: served} = state) do
